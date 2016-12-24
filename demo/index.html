@@ -46,7 +46,7 @@
                         var endIndex = this.selectionEnd;
 
                         if (startIndex === endIndex && startIndex - tabDelimeter.length + 1 >= 0) {
-                            if (isSoftTab(this.value, tabDelimeter, startIndex - tabDelimeter.length + 1)) {
+                            if (!isSoftTab(this.value, tabDelimeter, startIndex - tabDelimeter.length)) {
                                 return;
                             }
 
@@ -93,13 +93,7 @@
             }
 
             function isSoftTab(string, tabDelimeter, index) {
-                for (var i = index, j = 0; j < tabDelimeter.length; ++i, ++j) {
-                    if (string.charAt(i) !== tabDelimeter.charAt(j)) {
-                        return false;
-                    }
-                }
-
-                return true;
+                return string.substring(index, index + tabDelimeter.length) === tabDelimeter;
             }
 
             var nodeOTCient = NodeOTClient.for('http://localhost:3000', window.location.hash.substring(1) || 'PPBqWA9');
