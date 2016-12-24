@@ -19,4 +19,9 @@ io.on('connection', socket => {
         console.log('Client joined', data.id);
         socket.join(data.id);
     });
+
+    socket.on('push', (id, operation) => {
+        console.log('Client pushed', operation);
+        socket.to(id).broadcast.emit('merge', operation);
+    });
 });

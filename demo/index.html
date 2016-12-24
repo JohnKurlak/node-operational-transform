@@ -61,6 +61,37 @@
                 }
             });
 
+            textarea.addEventListener('keypress', function (e) {
+                var affectedText = this.value.substring(this.selectionStart, this.selectionEnd + 1);
+                var affectedLines = toLines(affectedText);
+
+                var startLines = toLines(this.value.substring(0, this.selectionStart));
+                var endLines = toLines(this.value.substring(0, this.selectionEnd));
+
+                var type = (e.keyCode === KEY_CODE.BACKSPACE) ? 'delete' : 'insert';
+
+                var operation = {
+                    type,
+                    lines: [String.fromCharCode(e.keyCode)],
+                    start: {
+                        row: startLines.length - 1,
+                        column: startLines[startLines.length - 1].length,
+                    },
+                    end: {
+                        row: endLines.length - 1,
+                        column: endLines[endLines.length - 1].length,
+                    },
+                };
+
+                console.log(operation);
+
+                nodeOTCient.commit(operation);
+            });
+
+            function toLines(string) {
+                return string.split(/\r*\n/);
+            }
+
             function isSoftTab(string, tabDelimeter, index) {
                 for (var i = index, j = 0; j < tabDelimeter.length; ++i, ++j) {
                     if (string.charAt(i) !== tabDelimeter.charAt(j)) {
@@ -71,7 +102,7 @@
                 return true;
             }
 
-            var nodeOTCient = NodeOTClient.for('http://localhost:3000', 'PPBqWA9');
+            var nodeOTCient = NodeOTClient.for('http://localhost:3000', window.location.hash.substring(1) || 'PPBqWA9');
         </script>
     </body>
 </html>
