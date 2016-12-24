@@ -71,15 +71,7 @@
                 return true;
             }
 
-            var socket = io.connect('http://localhost:3000');
-
-            socket.on('outgoingUpdateAccepted', function (data) {
-
-            });
-
-            socket.on('incomingUpdate', function (data) {
-
-            });
+            var nodeOTCient = NodeOTClient.for('http://localhost:3000', 'PPBqWA9');
         </script>
     </body>
 </html>
