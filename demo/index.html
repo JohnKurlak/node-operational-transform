@@ -32,7 +32,7 @@
                     type: 'insert',
                     text: String.fromCharCode(e.keyCode),
                     start: this.selectionStart,
-                    end: Math.max(this.selectionEnd, this.selectionStart + 1),
+                    end: this.selectionEnd,
                 });
             });
 
@@ -57,6 +57,14 @@
                 'http://localhost:3000',
                 window.location.hash.substring(1) || 'PPBqWA9'
             );
+
+            nodeOTCient.on('merge', function (operation) {
+                if (operation.type === 'insert') {
+                    textarea.value = textarea.value.substring(0, operation.start) + operation.text + textarea.value.substring(operation.end);
+                } else if (operation.type === 'delete') {
+                    textarea.value = textarea.value.substring(0, operation.start) + textarea.value.substring(operation.end);
+                }
+            });
         </script>
     </body>
 </html>

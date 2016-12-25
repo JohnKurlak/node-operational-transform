@@ -9,6 +9,7 @@
         constructor(socketIOEndpoint, id) {
             this.socketIOEndpoint = socketIOEndpoint;
             this.id = id;
+            this._handlers = {};
 
             this._connect();
             this._listen();
@@ -20,22 +21,38 @@
 
         commit(operation) {
             console.log('pushing', operation);
-            this._send('push', operation);
+            this._sendServer('push', operation);
+        }
+
+        on(eventName, handler) {
+            this._handlers[eventName] = this._handlers[eventName] || [];
+            this._handlers[eventName].push(handler);
+        }
+
+        _merge(operation) {
+            console.log('merging', operation);
+            this._sendClient('merge', operation);
         }
 
         _connect() {
             this.socket = io.connect(this.socketIOEndpoint);
-            this._send('join');
+            this._sendServer('join');
         }
 
         _listen() {
-            this.socket.on('merge', operation => {
-                console.log('merging', operation);
-            });
+            this.socket.on('merge', this._merge.bind(this));
         }
 
-        _send(eventName, ...args) {
+        _sendServer(eventName, ...args) {
             this.socket.emit(eventName, this.id, ...args);
+        }
+
+        _sendClient(eventName, ...args) {
+            const handlers = this._handlers[eventName] || [];
+
+            handlers.forEach(handler => {
+                handler(...args);
+            });
         }
     }
 
