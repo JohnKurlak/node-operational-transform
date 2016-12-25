@@ -20,18 +20,22 @@
 
         commit(operation) {
             console.log('pushing', operation);
-            this.socket.emit('push', this.id, operation);
+            this._send('push', operation);
         }
 
         _connect() {
             this.socket = io.connect(this.socketIOEndpoint);
-            this.socket.emit('join', { id: this.id });
+            this._send('join');
         }
 
         _listen() {
             this.socket.on('merge', operation => {
                 console.log('merging', operation);
             });
+        }
+
+        _send(eventName, ...args) {
+            this.socket.emit(eventName, this.id, ...args);
         }
     }
 

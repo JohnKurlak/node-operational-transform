@@ -15,9 +15,9 @@ server.listen(port, () => {
 });
 
 io.on('connection', socket => {
-    socket.on('join', data => {
-        console.log('Client joined', data.id);
-        socket.join(data.id);
+    socket.on('join', id => {
+        console.log('Client joined', id);
+        socket.join(id);
     });
 
     socket.on('push', (id, operation) => {

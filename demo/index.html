@@ -53,7 +53,10 @@
                 });
             });
 
-            var nodeOTCient = NodeOTClient.for('http://localhost:3000', window.location.hash.substring(1) || 'PPBqWA9');
+            var nodeOTCient = NodeOTClient.for(
+                'http://localhost:3000',
+                window.location.hash.substring(1) || 'PPBqWA9'
+            );
         </script>
     </body>
 </html>
