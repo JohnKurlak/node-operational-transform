@@ -41,15 +41,10 @@
                     return;
                 }
 
-                var deleteStart = (this.selectionStart === this.selectionEnd) ? this.selectionStart - 1 : this.selectionStart;
-                var deleteEnd = Math.max(this.selectionEnd, this.selectionStart - 1);
-                var deleteText = this.value.substring(deleteStart, deleteEnd + 1);
-
                 nodeOTCient.commit({
                     type: 'delete',
-                    text: deleteText,
-                    start: deleteStart,
-                    end: deleteEnd,
+                    start: this.selectionStart,
+                    end: this.selectionEnd,
                 });
             });
 
@@ -57,14 +52,62 @@
                 'http://localhost:3000',
                 window.location.hash.substring(1) || 'PPBqWA9'
             );
+            nodeOTCient.on('merge', merge);
 
-            nodeOTCient.on('merge', function (operation) {
+            function merge(operation) {
                 if (operation.type === 'insert') {
                     textarea.value = textarea.value.substring(0, operation.start) + operation.text + textarea.value.substring(operation.end);
                 } else if (operation.type === 'delete') {
-                    textarea.value = textarea.value.substring(0, operation.start) + textarea.value.substring(operation.end);
+                    var deleteStart = (operation.start === operation.end) ? operation.start - 1 : operation.start;
+                    var deleteEnd = Math.max(operation.end, operation.start - 1);
+                    textarea.value = textarea.value.substring(0, deleteStart) + textarea.value.substring(deleteEnd);
+                }
+            }
+
+            window.addEventListener('hashchange', function (e) {
+                var hash = window.location.hash.substring(1);
+                if (hash === '') {
+                    return;
+                }
+
+                var operation = JSON.parse(hash);
+
+                textarea.selectionStart = operation.start;
+                textarea.selectionEnd = operation.end;
+
+                if (operation.type === 'insert') {
+                    merge(operation);
+                    for (var i = 0; i < operation.text.length; ++i) {
+                        sendKey(textarea, operation.text.charCodeAt(i));
+                        textarea.selectionStart = textarea.selectionEnd = textarea.selectionStart + 1;
+                    }
+                } else if (operation.type === 'delete') {
+                    sendKey(textarea, KEY_CODE.BACKSPACE);
+                    merge(operation);
                 }
             });
+
+            function sendKey(textarea, charCode) {
+                var keydown = document.createEvent('KeyboardEvent');
+                Object.defineProperty(keydown, 'keyCode', {
+                    get: function () {
+                        return charCode;
+                    }
+                });
+
+                var keypress = document.createEvent('KeyboardEvent');
+                Object.defineProperty(keypress, 'keyCode', {
+                    get: function () {
+                        return charCode;
+                    }
+                });
+
+                keydown.initKeyboardEvent('keydown', true, true, document.defaultView);
+                keypress.initKeyboardEvent('keypress', true, true, document.defaultView);
+
+                textarea.dispatchEvent(keydown);
+                textarea.dispatchEvent(keypress);
+            }
         </script>
     </body>
 </html>

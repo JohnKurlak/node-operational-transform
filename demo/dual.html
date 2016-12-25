@@ -3,27 +3,70 @@
     <head>
         <link rel="stylesheet" type="text/css" href="reset.css" />
         <style type="text/css">
-        .left {
+        .right, .left {
             position: absolute;
+            padding-bottom: 40px;
+            box-sizing: border-box;
+        }
+
+        .left {
             top: 0;
-            bottom: 0;
             left: 0;
             width: 50%;
             height: 100%;
         }
 
         .right {
-            position: absolute;
             top: 0;
-            bottom: 0;
             right: 0;
             width: 50%;
             height: 100%;
+        }
+
+        .test-scenarios {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 40px;
+            padding: 10px;
+            box-sizing: border-box;
         }
         </style>
     </head>
     <body>
         <iframe src="index.html#test" class="left"></iframe>
         <iframe src="index.html#test" class="right"></iframe>
+        <div class="test-scenarios">
+            <button class="test1">Test 1</button>
+        </div>
+        <script type="text/javascript">
+        var test1 = document.querySelector('.test1');
+        var left = document.querySelector('.left');
+        var right = document.querySelector('.right');
+
+        test1.addEventListener('click', function () {
+            send(left, 'insert', 'hello', 0, 0);
+
+            setTimeout(function () {
+                send(right, 'insert', ' world', 5, 5);
+            }, 1000);
+
+            setTimeout(function () {
+                send(left, 'insert', ' there', 5, 5);
+            }, 1000);
+        });
+
+        function send(iframe, type, text, start, end) {
+            var operation = {
+                type: type,
+                text: text,
+                start: start,
+                end: end,
+            };
+
+            iframe.src = iframe.src.split('#')[0] + '#' + JSON.stringify(operation);
+        }
+        </script>
     </body>
 </html>
