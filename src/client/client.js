@@ -30,7 +30,7 @@
 
         _listen() {
             this.socket.on('merge', operation => {
-                console.log('merge', operation);
+                console.log('merging', operation);
             });
         }
     }

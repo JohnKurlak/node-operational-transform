@@ -22,79 +22,36 @@
         <script type="text/javascript">
             var KEY_CODE = {
                 BACKSPACE: 8,
-                TAB: 9,
             }
-            var tabDelimeter = '    ';
             var textarea = document.querySelector('textarea');
 
             textarea.focus();
 
-            textarea.addEventListener('keydown', function (e) {
-                switch (e.keyCode) {
-                    case KEY_CODE.TAB: {
-                        var startIndex = this.selectionStart;
-                        var endIndex = this.selectionEnd;
-
-                        this.value = this.value.substring(0, startIndex) + tabDelimeter + this.value.substring(endIndex);
-                        this.selectionStart = this.selectionEnd = startIndex + tabDelimeter.length;
-
-                        e.preventDefault();
-                        break;
-                    }
-                    case KEY_CODE.BACKSPACE: {
-                        var startIndex = this.selectionStart;
-                        var endIndex = this.selectionEnd;
-
-                        if (startIndex === endIndex && startIndex - tabDelimeter.length + 1 >= 0) {
-                            if (!isSoftTab(this.value, tabDelimeter, startIndex - tabDelimeter.length)) {
-                                return;
-                            }
-
-                            this.value = this.value.substring(0, startIndex - tabDelimeter.length) + this.value.substring(startIndex);
-                            this.selectionStart = this.selectionEnd = startIndex;
-
-                            e.preventDefault();
-                        }
-
-                        break;
-                    }
-                }
-            });
-
             textarea.addEventListener('keypress', function (e) {
-                var affectedText = this.value.substring(this.selectionStart, this.selectionEnd + 1);
-                var affectedLines = toLines(affectedText);
-
-                var startLines = toLines(this.value.substring(0, this.selectionStart));
-                var endLines = toLines(this.value.substring(0, this.selectionEnd));
-
-                var type = (e.keyCode === KEY_CODE.BACKSPACE) ? 'delete' : 'insert';
-
-                var operation = {
-                    type,
-                    lines: [String.fromCharCode(e.keyCode)],
-                    start: {
-                        row: startLines.length - 1,
-                        column: startLines[startLines.length - 1].length,
-                    },
-                    end: {
-                        row: endLines.length - 1,
-                        column: endLines[endLines.length - 1].length,
-                    },
-                };
-
-                console.log(operation);
-
-                nodeOTCient.commit(operation);
+                nodeOTCient.commit({
+                    type: 'insert',
+                    text: String.fromCharCode(e.keyCode),
+                    start: this.selectionStart,
+                    end: Math.max(this.selectionEnd, this.selectionStart + 1),
+                });
             });
 
-            function toLines(string) {
-                return string.split(/\r*\n/);
-            }
+            textarea.addEventListener('keydown', function (e) {
+                if (e.keyCode !== KEY_CODE.BACKSPACE || (this.selectionStart === 0 && this.selectionEnd === 0)) {
+                    return;
+                }
 
-            function isSoftTab(string, tabDelimeter, index) {
-                return string.substring(index, index + tabDelimeter.length) === tabDelimeter;
-            }
+                var deleteStart = (this.selectionStart === this.selectionEnd) ? this.selectionStart - 1 : this.selectionStart;
+                var deleteEnd = Math.max(this.selectionEnd, this.selectionStart - 1);
+                var deleteText = this.value.substring(deleteStart, deleteEnd + 1);
+
+                nodeOTCient.commit({
+                    type: 'delete',
+                    text: deleteText,
+                    start: deleteStart,
+                    end: deleteEnd,
+                });
+            });
 
             var nodeOTCient = NodeOTClient.for('http://localhost:3000', window.location.hash.substring(1) || 'PPBqWA9');
         </script>
