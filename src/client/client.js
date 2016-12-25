@@ -10,6 +10,7 @@
             this.socketIOEndpoint = socketIOEndpoint;
             this.id = id;
             this._handlers = {};
+            this.version = 0;
 
             this._connect();
             this._listen();
@@ -29,8 +30,9 @@
             this._handlers[eventName].push(handler);
         }
 
-        _merge(operation) {
+        _merge(version, operation) {
             console.log('merging', operation);
+            this.version = version;
             this._sendClient('merge', operation);
         }
 
@@ -44,7 +46,7 @@
         }
 
         _sendServer(eventName, ...args) {
-            this.socket.emit(eventName, this.id, ...args);
+            this.socket.emit(eventName, this.id, this.version, ...args);
         }
 
         _sendClient(eventName, ...args) {
