@@ -36,6 +36,15 @@
                 });
             });
 
+            textarea.addEventListener('paste', function (e) {
+                nodeOTCient.commit({
+                    type: 'insert',
+                    text: e.clipboardData.getData('text'),
+                    start: this.selectionStart,
+                    end: this.selectionEnd,
+                })
+            });
+
             textarea.addEventListener('keydown', function (e) {
                 if (e.keyCode !== KEY_CODE.BACKSPACE || (this.selectionStart === 0 && this.selectionEnd === 0)) {
                     return;
