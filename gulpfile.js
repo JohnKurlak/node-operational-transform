@@ -15,11 +15,17 @@ gulp.task('run', callback => {
 });
 
 gulp.task('build', () => {
+    const babelTranslate = babel({
+        presets: ['es2015']
+    });
+    babelTranslate.on('error', error => {
+        console.log(error.stack.split('    at')[0]);
+        babelTranslate.end();
+    });
+
     return gulp
         .src(CLIENT_JS_PATH)
-        .pipe(babel({
-            presets: ['es2015']
-        }))
+        .pipe(babelTranslate)
         .pipe(concat('client.js'))
         .pipe(gulp.dest('dist'));
 });
