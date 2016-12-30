@@ -22,7 +22,8 @@
         <script type="text/javascript">
             var KEY_CODE = {
                 BACKSPACE: 8,
-            }
+                DELETE: 46,
+            };
             var textarea = document.querySelector('textarea');
 
             textarea.focus();
@@ -46,22 +47,42 @@
             });
 
             textarea.addEventListener('keydown', function (e) {
-                if (e.keyCode !== KEY_CODE.BACKSPACE || (this.selectionStart === 0 && this.selectionEnd === 0)) {
+                var isBackspaceKey = (e.keyCode === KEY_CODE.BACKSPACE);
+                var isDeleteKey = (e.keyCode === KEY_CODE.DELETE);
+
+                if (!isBackspaceKey && !isDeleteKey) {
                     return;
                 }
 
+                var isSingleDelete = (this.selectionStart === this.selectionEnd);
+                var isAtFirstCharacter = (this.selectionStart === 0);
+                var isAtLastCharacter = (this.selectionEnd === textarea.length - 1);
+
                 var deleteText = '';
-                if (this.selectionStart === this.selectionEnd && this.selectionStart !== 0) {
-                    deleteText = textarea.value.substring(this.selectionStart - 1, this.selectionStart);
-                } else if (this.selectionStart !== this.selectionEnd) {
+                var deleteStart = this.selectionStart;
+                var deleteEnd = this.selectionEnd;
+
+                if (isSingleDelete) {
+                    if (isBackspaceKey && !isAtFirstCharacter) {
+                        deleteText = textarea.value.substring(this.selectionStart - 1, this.selectionStart);
+                    } else if (isDeleteKey && !isAtLastCharacter) {
+                        deleteText = textarea.value.substring(this.selectionEnd, this.selectionEnd + 1);
+                        ++deleteStart;
+                        ++deleteEnd;
+                    }
+                } else {
                     deleteText = textarea.value.substring(this.selectionStart, this.selectionEnd);
+                }
+
+                if (deleteText.length === 0) {
+                    return;
                 }
 
                 nodeOTCient.commit({
                     type: 'delete',
                     text: deleteText,
-                    start: this.selectionStart,
-                    end: this.selectionEnd,
+                    start: deleteStart,
+                    end: deleteEnd,
                 });
             });
 
