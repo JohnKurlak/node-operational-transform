@@ -43,7 +43,16 @@
                     text: e.clipboardData.getData('text'),
                     start: this.selectionStart,
                     end: this.selectionEnd,
-                })
+                });
+            });
+
+            textarea.addEventListener('cut', function (e) {
+                nodeOTCient.commit({
+                    type: 'delete',
+                    text: textarea.value.substring(this.selectionStart, this.selectionEnd),
+                    start: this.selectionStart,
+                    end: this.selectionEnd,
+                });
             });
 
             textarea.addEventListener('keydown', function (e) {
