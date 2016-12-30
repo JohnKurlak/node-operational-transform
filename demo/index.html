@@ -50,8 +50,16 @@
                     return;
                 }
 
+                var deleteText = '';
+                if (this.selectionStart === this.selectionEnd && this.selectionStart !== 0) {
+                    deleteText = textarea.value.substring(this.selectionStart - 1, this.selectionStart);
+                } else if (this.selectionStart !== this.selectionEnd) {
+                    deleteText = textarea.value.substring(this.selectionStart, this.selectionEnd);
+                }
+
                 nodeOTCient.commit({
                     type: 'delete',
+                    text: deleteText,
                     start: this.selectionStart,
                     end: this.selectionEnd,
                 });
