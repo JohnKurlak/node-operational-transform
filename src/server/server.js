@@ -24,6 +24,10 @@ io.on('connection', socket => {
         if (!otDocuments[id]) {
             otDocuments[id] = new OperationalTransformation();
         }
+
+        otDocuments[id].operations.forEach((operation, index) => {
+            socket.emit('merge', index + 1, operation);
+        });
     });
 
     socket.on('push', (id, version, operation) => {
@@ -54,6 +58,10 @@ class OperationalTransformation {
 
     get version() {
         return this._version;
+    }
+
+    get operations() {
+        return this._operations;
     }
 
     merge(version, operation) {
