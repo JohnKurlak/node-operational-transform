@@ -55,7 +55,7 @@
             textarea.addEventListener('cut', function (e) {
                 nodeOTCient.commit({
                     type: 'delete',
-                    text: textarea.value.substring(this.selectionStart, this.selectionEnd),
+                    text: this.value.substring(this.selectionStart, this.selectionEnd),
                     index: this.selectionStart,
                 });
             });
@@ -70,7 +70,7 @@
 
                 var isSingleDelete = (this.selectionStart === this.selectionEnd);
                 var isAtFirstCharacter = (this.selectionStart === 0);
-                var isAtLastCharacter = (this.selectionEnd === textarea.length - 1);
+                var isAtLastCharacter = (this.selectionEnd === this.length - 1);
 
                 var deleteStart = this.selectionStart;
                 var deleteEnd = this.selectionEnd;
@@ -85,7 +85,7 @@
                     }
                 }
 
-                var deleteText = textarea.value.substring(deleteStart, deleteEnd);
+                var deleteText = this.value.substring(deleteStart, deleteEnd);
 
                 if (deleteText.length === 0) {
                     return;
