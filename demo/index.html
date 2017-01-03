@@ -106,6 +106,9 @@
             nodeOTCient.on('apply', applyOperation);
 
             function applyOperation(operation) {
+                var selectionStart = textarea.selectionStart;
+                var selectionEnd = textarea.selectionEnd;
+
                 if (operation.type === 'insert') {
                     textarea.value = textarea.value.substring(0, operation.index) + operation.text + textarea.value.substring(operation.index);
                 } else if (operation.type === 'delete') {
@@ -113,6 +116,22 @@
                     var deleteEnd = operation.index + operation.text.length;
                     textarea.value = textarea.value.substring(0, deleteStart) + textarea.value.substring(deleteEnd);
                 }
+
+                var transformedSelectionStart = selectionStart;
+                var transformedSelectionEnd = selectionEnd;
+
+                if (operation.index < selectionStart) {
+                    if (operation.type === 'insert') {
+                        transformedSelectionStart += operation.text.length;
+                        transformedSelectionEnd += operation.text.length;
+                    } else if (operation.type === 'delete') {
+                        transformedSelectionStart -= operation.text.length;
+                        transformedSelectionEnd -= operation.text.length;
+                    }
+                }
+
+                textarea.selectionStart = transformedSelectionStart;
+                textarea.selectionEnd = transformedSelectionEnd;
             }
 
             window.addEventListener('hashchange', function (e) {
