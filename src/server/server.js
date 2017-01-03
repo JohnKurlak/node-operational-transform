@@ -38,11 +38,11 @@ io.on('connection', socket => {
         }
 
         console.log('Client (v. ' + version + ') pushed', operation, 'to server (v. ' + otDocument.version + ')');
-        console.log('Non transformed operation is', operation.type, 'with start=', operation.start, 'and end=', operation.end);
+        console.log('Non-transformed operation is', operation.type, 'with index=', operation.index);
 
         otDocument.merge(version, operation);
 
-        console.log('Transformed operation is    ', operation.type, 'with start=', operation.start, 'and end=', operation.end);
+        console.log('Transformed operation is    ', operation.type, 'with index=', operation.index);
 
         socket.emit('merged', otDocument.version);
         socket.to(id).broadcast.emit('merge', otDocument.version, operation);
@@ -78,32 +78,10 @@ class OperationalTransformation {
         // TODO: Add support for more operation types
 
         if (this._isInsert(newOperation) && this._isInsert(oldOperation)) {
-            if (newOperation.start === newOperation.end && oldOperation.start === oldOperation.end) {
-                if (oldOperation.start < newOperation.start) {
-                    newOperation.start += oldOperation.text.length;
-                    newOperation.end = newOperation.start;
-                }
+            if (oldOperation.index < newOperation.index) {
+                newOperation.index += oldOperation.text.length;
             }
         }
-    }
-
-    // TODO: Use this
-    _getDeleteRange(operation) {
-        let deleteStart = operation.start;
-        let deleteEnd = operation.end;
-
-        if (this._isDelete(operation) && deleteStart === deleteEnd) {
-            deleteStart = Math.max(0, deleteStart - 1);
-        }
-
-        return {
-            start: deleteStart,
-            end: deleteEnd,
-        };
-    }
-
-    _getInsertPosition(operation) {
-        return operation.start;
     }
 
     _isInsert(operation) {

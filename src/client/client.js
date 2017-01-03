@@ -120,18 +120,16 @@
             return {
                 type: isInsert ? 'delete' : 'insert',
                 text: operation.text,
-                start: operation.start,
-                end: isInsert ? operation.start + operation.text.length : operation.start,
+                index: operation.index,
             };
         }
 
         _transform(newOperation, oldOperation) {
+            // TODO: Add support for more operation types
+
             if (this._isInsert(newOperation) && this._isInsert(oldOperation)) {
-                if (newOperation.start === newOperation.end && oldOperation.start === oldOperation.end) {
-                    if (oldOperation.start < newOperation.start) {
-                        newOperation.start += oldOperation.text.length;
-                        newOperation.end = newOperation.start;
-                    }
+                if (oldOperation.index < newOperation.index) {
+                    newOperation.index += oldOperation.text.length;
                 }
             }
         }

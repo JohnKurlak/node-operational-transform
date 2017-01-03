@@ -40,8 +40,7 @@
                 nodeOTCient.commit({
                     type: 'insert',
                     text: String.fromCharCode(e.keyCode),
-                    start: this.selectionStart,
-                    end: this.selectionEnd,
+                    index: this.selectionStart,
                 });
             });
 
@@ -49,8 +48,7 @@
                 nodeOTCient.commit({
                     type: 'insert',
                     text: e.clipboardData.getData('text'),
-                    start: this.selectionStart,
-                    end: this.selectionEnd,
+                    index: this.selectionStart,
                 });
             });
 
@@ -58,8 +56,7 @@
                 nodeOTCient.commit({
                     type: 'delete',
                     text: textarea.value.substring(this.selectionStart, this.selectionEnd),
-                    start: this.selectionStart,
-                    end: this.selectionEnd,
+                    index: this.selectionStart,
                 });
             });
 
@@ -75,21 +72,20 @@
                 var isAtFirstCharacter = (this.selectionStart === 0);
                 var isAtLastCharacter = (this.selectionEnd === textarea.length - 1);
 
-                var deleteText = '';
                 var deleteStart = this.selectionStart;
                 var deleteEnd = this.selectionEnd;
 
                 if (isSingleDelete) {
                     if (isBackspaceKey && !isAtFirstCharacter) {
-                        deleteText = textarea.value.substring(this.selectionStart - 1, this.selectionStart);
+                        deleteStart = this.selectionStart - 1;
+                        deleteEnd = this.selectionStart;
                     } else if (isDeleteKey && !isAtLastCharacter) {
-                        deleteText = textarea.value.substring(this.selectionEnd, this.selectionEnd + 1);
-                        ++deleteStart;
-                        ++deleteEnd;
+                        deleteStart = this.selectionEnd;
+                        deleteEnd = this.selectionEnd + 1;
                     }
-                } else {
-                    deleteText = textarea.value.substring(this.selectionStart, this.selectionEnd);
                 }
+
+                var deleteText = textarea.value.substring(deleteStart, deleteEnd);
 
                 if (deleteText.length === 0) {
                     return;
@@ -98,8 +94,7 @@
                 nodeOTCient.commit({
                     type: 'delete',
                     text: deleteText,
-                    start: deleteStart,
-                    end: deleteEnd,
+                    index: deleteStart,
                 });
             });
 
@@ -112,10 +107,10 @@
 
             function applyOperation(operation) {
                 if (operation.type === 'insert') {
-                    textarea.value = textarea.value.substring(0, operation.start) + operation.text + textarea.value.substring(operation.end);
+                    textarea.value = textarea.value.substring(0, operation.index) + operation.text + textarea.value.substring(operation.index);
                 } else if (operation.type === 'delete') {
-                    var deleteStart = (operation.start === operation.end) ? operation.start - 1 : operation.start;
-                    var deleteEnd = Math.max(operation.end, operation.start - 1);
+                    var deleteStart = operation.index;
+                    var deleteEnd = operation.index + operation.text.length;
                     textarea.value = textarea.value.substring(0, deleteStart) + textarea.value.substring(deleteEnd);
                 }
             }

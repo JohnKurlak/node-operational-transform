@@ -46,23 +46,22 @@
         var right = document.querySelector('.right');
 
         test1.addEventListener('click', function () {
-            send(left, 'insert', 'hello', 0, 0);
+            send(left, 'insert', 'hello', 0);
 
             setTimeout(function () {
-                send(right, 'insert', ' world', 5, 5);
+                send(right, 'insert', ' world', 5);
             }, 1000);
 
             setTimeout(function () {
-                send(left, 'insert', ' there', 5, 5);
+                send(left, 'insert', ' there', 5);
             }, 1000);
         });
 
-        function send(iframe, type, text, start, end) {
+        function send(iframe, type, text, index) {
             var operation = {
                 type: type,
                 text: text,
-                start: start,
-                end: end,
+                index: index,
             };
 
             iframe.src = iframe.src.split('#')[0] + '#' + JSON.stringify(operation);
