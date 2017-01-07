@@ -38,6 +38,8 @@
             // TODO: Move document logic into separate adapter file
 
             textarea.addEventListener('keypress', function (e) {
+                clearSelection();
+
                 nodeOTCient.commit({
                     type: 'insert',
                     text: String.fromCharCode(e.keyCode),
@@ -46,6 +48,8 @@
             });
 
             textarea.addEventListener('paste', function (e) {
+                clearSelection();
+
                 nodeOTCient.commit({
                     type: 'insert',
                     text: e.clipboardData.getData('text'),
@@ -86,11 +90,11 @@
                     }
                 }
 
-                var deleteText = this.value.substring(deleteStart, deleteEnd);
-
-                if (deleteText.length === 0) {
+                if (deleteStart === deleteEnd) {
                     return;
                 }
+
+                var deleteText = this.value.substring(deleteStart, deleteEnd);
 
                 nodeOTCient.commit({
                     type: 'delete',
@@ -132,6 +136,27 @@
 
                 textarea.selectionStart = transformedSelectionStart;
                 textarea.selectionEnd = transformedSelectionEnd;
+            }
+
+            function clearSelection() {
+                var deleteStart = textarea.selectionStart;
+                var deleteEnd = textarea.selectionEnd;
+
+                if (deleteStart === deleteEnd) {
+                    return;
+                }
+
+                var deleteText = textarea.value.substring(deleteStart, deleteEnd);
+
+                textarea.value = textarea.value.substring(0, deleteStart) + textarea.value.substring(deleteEnd);
+                textarea.selectionStart = deleteStart;
+                textarea.selectionEnd = deleteStart;
+
+                nodeOTCient.commit({
+                    type: 'delete',
+                    text: deleteText,
+                    index: deleteStart,
+                });
             }
 
             window.addEventListener('hashchange', function (e) {
