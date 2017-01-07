@@ -12,7 +12,7 @@
             this._handlers = {};
             this._otDocument = new OperationalTransformation(
                 operation => this._sendServer('push', operation),
-                operation => this._sendClient('apply', operation),
+                (operation, isLocalOperation) => this._sendClient('apply', operation, isLocalOperation),
             );
 
             this._connect();
@@ -101,7 +101,7 @@
 
             for (let i = 0; i < this.pendingOperations.length; ++i) {
                 this._transform(this.pendingOperations[i], operation);
-                this._applyToClient(this.pendingOperations[i]);
+                this._applyToClient(this.pendingOperations[i], true);
             }
         }
 

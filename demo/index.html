@@ -106,9 +106,11 @@
 
             nodeOTCient.on('apply', applyOperation);
 
-            function applyOperation(operation) {
+            function applyOperation(operation, isLocalOperation) {
                 var selectionStart = textarea.selectionStart;
                 var selectionEnd = textarea.selectionEnd;
+                var transformedSelectionStart = selectionStart;
+                var transformedSelectionEnd = selectionEnd;
 
                 if (operation.type === 'insert') {
                     textarea.value = textarea.value.substring(0, operation.index) + operation.text + textarea.value.substring(operation.index);
@@ -118,10 +120,7 @@
                     textarea.value = textarea.value.substring(0, deleteStart) + textarea.value.substring(deleteEnd);
                 }
 
-                var transformedSelectionStart = selectionStart;
-                var transformedSelectionEnd = selectionEnd;
-
-                if (operation.index < selectionStart) {
+                if (operation.index < selectionStart || isLocalOperation) {
                     if (operation.type === 'insert') {
                         transformedSelectionStart += operation.text.length;
                         transformedSelectionEnd += operation.text.length;
