@@ -1,10 +1,4 @@
 const gulp = require('gulp');
-const babel = require('gulp-babel');
-const concat = require('gulp-concat');
-const watch = require('gulp-watch');
-const spawn = require('child_process').spawn;
-const resolveDependencies = require('gulp-resolve-dependencies');
-
 const CLIENT_JS_PATH = ['src/client/**/*.js', 'src/shared/**/*.js'];
 
 gulp.task('default', () => {
@@ -12,10 +6,16 @@ gulp.task('default', () => {
 });
 
 gulp.task('run', callback => {
+    const spawn = require('child_process').spawn;
+
     spawn('node', ['src/server/server.js'], { stdio: 'inherit' });
 });
 
 gulp.task('build', () => {
+    const babel = require('gulp-babel');
+    const concat = require('gulp-concat');
+    const resolveDependencies = require('gulp-resolve-dependencies');
+
     const babelTranslate = babel({
         presets: ['es2015'],
     });
@@ -40,6 +40,8 @@ gulp.task('build', () => {
 });
 
 gulp.task('watch', () => {
+    const watch = require('gulp-watch');
+
     return watch(CLIENT_JS_PATH, () => {
         gulp.start('build');
     });
