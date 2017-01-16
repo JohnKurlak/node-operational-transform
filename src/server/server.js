@@ -8,7 +8,7 @@ const app = express();
 const server = http.Server(app);
 const io = socketio(server);
 
-const OperationTransformer = require('../shared/operation-transformer');
+const OTDocument = require('./ot-document')
 
 const port = 3000;
 
@@ -24,7 +24,7 @@ io.on('connection', socket => {
         socket.join(id);
 
         if (!otDocuments[id]) {
-            otDocuments[id] = new OperationalTransformation();
+            otDocuments[id] = new OTDocument();
         }
 
         otDocuments[id].operations.forEach((operation, index) => {
@@ -50,29 +50,3 @@ io.on('connection', socket => {
         socket.to(id).broadcast.emit('merge', otDocument.version, operation);
     });
 });
-
-// TODO: Move into separate file
-class OperationalTransformation {
-    constructor() {
-        this._version = 0;
-        this._operations = [];
-    }
-
-    get version() {
-        return this._version;
-    }
-
-    get operations() {
-        return this._operations;
-    }
-
-    merge(version, operation) {
-        for (let i = version; i < this._version; ++i) {
-            OperationTransformer.transform(operation, this._operations[i]);
-        }
-
-        this._operations.push(operation);
-        ++this._version;
-        return operation;
-    }
-}
