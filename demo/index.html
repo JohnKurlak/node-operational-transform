@@ -27,6 +27,13 @@
         </script>
         <script type="text/javascript" src="../dist/client.js"></script>
         <script type="text/javascript">
+            var nodeOTCient = NodeOT.Client.for(
+                'http://localhost:3000',
+                window.location.hash.substring(1) || 'PPBqWA9'
+            );
+
+            nodeOTCient.on('apply', applyOperation);
+
             var KEY_CODE = {
                 BACKSPACE: 8,
                 DELETE: 46,
@@ -102,13 +109,6 @@
                     index: deleteStart,
                 });
             });
-
-            var nodeOTCient = NodeOTClient.for(
-                'http://localhost:3000',
-                window.location.hash.substring(1) || 'PPBqWA9'
-            );
-
-            nodeOTCient.on('apply', applyOperation);
 
             function applyOperation(operation, isLocalOperation) {
                 var selectionStart = textarea.selectionStart;

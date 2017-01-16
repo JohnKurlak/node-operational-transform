@@ -1,11 +1,18 @@
-(function () {
+/**
+ * @requires ../client/init.js
+ * @requires ../shared/operation-transformer.js
+ */
+
+(function (NodeOT) {
     'use strict';
 
     if (!io) {
         throw new Error('io must be defined! Make sure you have loaded the socket.io client.');
     }
 
-    class NodeOTClient {
+    const OperationTransformer = NodeOT.OperationTransformer;
+
+    class Client {
         constructor(socketIOEndpoint, id) {
             this._socketIOEndpoint = socketIOEndpoint;
             this._id = id;
@@ -20,7 +27,7 @@
         }
 
         static for(socketIOEndpoint, id) {
-            return new NodeOTClient(socketIOEndpoint, id);
+            return new Client(socketIOEndpoint, id);
         }
 
         on(eventName, handler) {
@@ -90,7 +97,7 @@
 
         merge(version, operation) {
             for (let i = this.pendingOperations.length - 1; i >= 0; --i) {
-                const inverseOperation = this._inverse(this.pendingOperations[i]);
+                const inverseOperation = OperationTransformer.inverse(this.pendingOperations[i]);
                 this._applyToClient(inverseOperation);
             }
 
@@ -100,7 +107,7 @@
             this._applyToClient(operation);
 
             for (let i = 0; i < this.pendingOperations.length; ++i) {
-                this._transform(this.pendingOperations[i], operation);
+                OperationTransformer.transform(this.pendingOperations[i], operation);
                 this._applyToClient(this.pendingOperations[i], true);
             }
         }
@@ -113,35 +120,7 @@
                 this._sendToServer(this.pendingOperations[0]);
             }
         }
-
-        _inverse(operation) {
-            const isInsert = this._isInsert(operation);
-
-            return {
-                type: isInsert ? 'delete' : 'insert',
-                text: operation.text,
-                index: operation.index,
-            };
-        }
-
-        _transform(newOperation, oldOperation) {
-            // TODO: Add support for more operation types
-
-            if (this._isInsert(newOperation) && this._isInsert(oldOperation)) {
-                if (oldOperation.index < newOperation.index) {
-                    newOperation.index += oldOperation.text.length;
-                }
-            }
-        }
-
-        _isInsert(operation) {
-            return (operation.type === 'insert');
-        }
-
-        _isDelete(operation) {
-            return (operation.type === 'delete');
-        }
     }
 
-    window.NodeOTClient = NodeOTClient;
-}());
+    NodeOT.Client = Client;
+}(window.NodeOT));

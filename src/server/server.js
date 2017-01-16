@@ -8,6 +8,8 @@ const app = express();
 const server = http.Server(app);
 const io = socketio(server);
 
+const OperationTransformer = require('../shared/operation-transformer');
+
 const port = 3000;
 
 server.listen(port, () => {
@@ -66,29 +68,11 @@ class OperationalTransformation {
 
     merge(version, operation) {
         for (let i = version; i < this._version; ++i) {
-            this._transform(operation, this._operations[i]);
+            OperationTransformer.transform(operation, this._operations[i]);
         }
 
         this._operations.push(operation);
         ++this._version;
         return operation;
-    }
-
-    _transform(newOperation, oldOperation) {
-        // TODO: Add support for more operation types
-
-        if (this._isInsert(newOperation) && this._isInsert(oldOperation)) {
-            if (oldOperation.index < newOperation.index) {
-                newOperation.index += oldOperation.text.length;
-            }
-        }
-    }
-
-    _isInsert(operation) {
-        return (operation.type === 'insert');
-    }
-
-    _isDelete(operation) {
-        return (operation.type === 'delete');
     }
 }

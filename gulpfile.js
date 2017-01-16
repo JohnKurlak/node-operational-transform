@@ -5,7 +5,7 @@ const watch = require('gulp-watch');
 const spawn = require('child_process').spawn;
 const resolveDependencies = require('gulp-resolve-dependencies');
 
-const CLIENT_JS_PATH = 'src/client/**/*.js';
+const CLIENT_JS_PATH = ['src/client/**/*.js', 'src/shared/**/*.js'];
 
 gulp.task('default', () => {
     gulp.start('run');
