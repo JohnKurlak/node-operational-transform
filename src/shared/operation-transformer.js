@@ -1,5 +1,13 @@
+/**
+ * @requires ./operation.js
+ */
+
 (function (global) {
     'use strict';
+
+    const Operation = (typeof module === 'object' && typeof exports === 'object')
+        ? require('./operation')
+        : window.NodeOT.Operation;
 
     class OperationTransformer {
         static transform(newOperation, oldOperation) {
@@ -16,18 +24,18 @@
             const isInsert = this.isInsert(operation);
 
             return {
-                type: isInsert ? 'delete' : 'insert',
+                type: isInsert ? Operation.DELETE : Operation.INSERT,
                 text: operation.text,
                 index: operation.index,
             };
         }
 
         static isInsert(operation) {
-            return (operation.type === 'insert');
+            return (operation.type === Operation.INSERT);
         }
 
         static isDelete(operation) {
-            return (operation.type === 'delete');
+            return (operation.type === Operation.DELETE);
         }
     }
 

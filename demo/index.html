@@ -48,7 +48,7 @@
                 clearSelection();
 
                 nodeOTCient.commit({
-                    type: 'insert',
+                    type: NodeOT.Operation.INSERT,
                     text: String.fromCharCode(e.keyCode),
                     index: this.selectionStart,
                 });
@@ -58,7 +58,7 @@
                 clearSelection();
 
                 nodeOTCient.commit({
-                    type: 'insert',
+                    type: NodeOT.Operation.INSERT,
                     text: e.clipboardData.getData('text'),
                     index: this.selectionStart,
                 });
@@ -66,7 +66,7 @@
 
             textarea.addEventListener('cut', function (e) {
                 nodeOTCient.commit({
-                    type: 'delete',
+                    type: NodeOT.Operation.DELETE,
                     text: this.value.substring(this.selectionStart, this.selectionEnd),
                     index: this.selectionStart,
                 });
@@ -104,7 +104,7 @@
                 var deleteText = this.value.substring(deleteStart, deleteEnd);
 
                 nodeOTCient.commit({
-                    type: 'delete',
+                    type: NodeOT.Operation.DELETE,
                     text: deleteText,
                     index: deleteStart,
                 });
@@ -116,19 +116,19 @@
                 var transformedSelectionStart = selectionStart;
                 var transformedSelectionEnd = selectionEnd;
 
-                if (operation.type === 'insert') {
+                if (operation.type === NodeOT.Operation.INSERT) {
                     textarea.value = textarea.value.substring(0, operation.index) + operation.text + textarea.value.substring(operation.index);
-                } else if (operation.type === 'delete') {
+                } else if (operation.type === NodeOT.Operation.DELETE) {
                     var deleteStart = operation.index;
                     var deleteEnd = operation.index + operation.text.length;
                     textarea.value = textarea.value.substring(0, deleteStart) + textarea.value.substring(deleteEnd);
                 }
 
                 if (operation.index < selectionStart || isLocalOperation) {
-                    if (operation.type === 'insert') {
+                    if (operation.type === NodeOT.Operation.INSERT) {
                         transformedSelectionStart += operation.text.length;
                         transformedSelectionEnd += operation.text.length;
-                    } else if (operation.type === 'delete') {
+                    } else if (operation.type === NodeOT.Operation.DELETE) {
                         transformedSelectionStart -= operation.text.length;
                         transformedSelectionEnd -= operation.text.length;
                     }
@@ -153,7 +153,7 @@
                 textarea.selectionEnd = deleteStart;
 
                 nodeOTCient.commit({
-                    type: 'delete',
+                    type: NodeOT.Operation.DELETE,
                     text: deleteText,
                     index: deleteStart,
                 });
