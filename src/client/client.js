@@ -1,6 +1,6 @@
 /**
  * @requires ../client/init.js
- * @requires ../shared/operation-transformer.js
+ * @requires ./ot-document.js
  */
 
 (function (NodeOT) {
@@ -10,14 +10,14 @@
         throw new Error('io must be defined! Make sure you have loaded the socket.io client.');
     }
 
-    const OperationTransformer = NodeOT.OperationTransformer;
+    const OTDocument = NodeOT.OTDocument;
 
     class Client {
         constructor(socketIOEndpoint, id) {
             this._socketIOEndpoint = socketIOEndpoint;
             this._id = id;
             this._handlers = {};
-            this._otDocument = new OperationalTransformation(
+            this._otDocument = new OTDocument(
                 operation => this._sendServer('push', operation),
                 (operation, isLocalOperation) => this._sendClient('apply', operation, isLocalOperation),
             );
@@ -74,51 +74,6 @@
             handlers.forEach(handler => {
                 handler(...args);
             });
-        }
-    }
-
-    // TODO: Move into separate file
-    class OperationalTransformation {
-        constructor(sendToServer, applyToClient) {
-            this.version = 0;
-            this.operations = [];
-            this.pendingOperations = [];
-            this._sendToServer = sendToServer;
-            this._applyToClient = applyToClient;
-        }
-
-        commit(operation) {
-            if (this.pendingOperations.length === 0) {
-                this._sendToServer(operation);
-            }
-
-            this.pendingOperations.push(operation);
-        }
-
-        merge(version, operation) {
-            for (let i = this.pendingOperations.length - 1; i >= 0; --i) {
-                const inverseOperation = OperationTransformer.inverse(this.pendingOperations[i]);
-                this._applyToClient(inverseOperation);
-            }
-
-            this.version = version;
-            this.operations.push(operation);
-
-            this._applyToClient(operation);
-
-            for (let i = 0; i < this.pendingOperations.length; ++i) {
-                OperationTransformer.transform(this.pendingOperations[i], operation);
-                this._applyToClient(this.pendingOperations[i], true);
-            }
-        }
-
-        merged(version) {
-            this.version = version;
-            this.operations.push(this.pendingOperations.shift());
-
-            if (this.pendingOperations.length > 0) {
-                this._sendToServer(this.pendingOperations[0]);
-            }
         }
     }
 
