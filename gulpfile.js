@@ -15,6 +15,8 @@ gulp.task('build', () => {
     const babel = require('gulp-babel');
     const concat = require('gulp-concat');
     const resolveDependencies = require('gulp-resolve-dependencies');
+    const rename = require('gulp-rename');
+    const uglify = require('gulp-uglify');
 
     const babelTranslate = babel({
         presets: ['es2015'],
@@ -33,9 +35,12 @@ gulp.task('build', () => {
 
     return gulp
         .src(CLIENT_JS_PATH)
-        .pipe(babelTranslate)
         .pipe(sortByDependencies)
+        .pipe(babelTranslate)
         .pipe(concat('client.js'))
+        .pipe(gulp.dest('dist'))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(uglify())
         .pipe(gulp.dest('dist'));
 });
 
