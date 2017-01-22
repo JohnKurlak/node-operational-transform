@@ -39,9 +39,11 @@
         <iframe src="index.html?id=RIGHT#test" class="right"></iframe>
         <div class="test-scenarios">
             <button class="test1">Test 1</button>
+            <button class="test2">Test 2</button>
         </div>
         <script type="text/javascript">
         var test1 = document.querySelector('.test1');
+        var test2 = document.querySelector('.test2');
         var left = document.querySelector('.left');
         var right = document.querySelector('.right');
 
@@ -50,6 +52,18 @@
 
             setTimeout(function () {
                 send(right, 'insert', ' world', 5);
+            }, 1000);
+
+            setTimeout(function () {
+                send(left, 'insert', ' there', 5);
+            }, 1000);
+        });
+
+        test2.addEventListener('click', function () {
+            send(left, 'insert', 'hello', 0);
+
+            setTimeout(function () {
+                send(right, 'insert', 'llooo', 4);
             }, 1000);
 
             setTimeout(function () {
