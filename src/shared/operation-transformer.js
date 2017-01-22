@@ -13,9 +13,19 @@
         static transform(newOperation, oldOperation) {
             // TODO: Add support for more operation types
 
-            if (this.isInsert(newOperation) && this.isInsert(oldOperation)) {
-                if (oldOperation.index < newOperation.index) {
-                    newOperation.index += oldOperation.text.length;
+            const newOperationIsInsert = this.isInsert(newOperation);
+            const newOperationLength = newOperation.text.length;
+            const newOperationStart = newOperation.index;
+            const newOperationEnd = newOperationStart + newOperationLength;
+
+            const oldOperationIsInsert = this.isInsert(oldOperation);
+            const oldOperationLength = oldOperation.text.length;
+            const oldOperationStart = oldOperation.index;
+            const oldOperationEnd = oldOperationStart + oldOperationLength;
+
+            if (newOperationIsInsert && oldOperationIsInsert) {
+                if (oldOperationStart <= newOperationStart) {
+                    newOperation.index += oldOperationLength;
                 }
             }
         }
