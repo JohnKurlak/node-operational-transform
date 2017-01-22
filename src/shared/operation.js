@@ -12,6 +12,6 @@
     global.NodeOT.Operation = new Operation();
 
     if (typeof module === 'object' && typeof exports === 'object') {
-        module.exports = Operation;
+        module.exports = new Operation();
     }
 }(typeof window !== 'undefined' ? window : this));
